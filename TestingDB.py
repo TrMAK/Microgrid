@@ -76,10 +76,10 @@ def get_pv_data(cursor, house_ids, day_str, month_str, year_str):
     SELECT house_id, watts_generated
     FROM PV
     WHERE house_id = ?
-      AND strftime('%d', timestamp) = ?
-      AND strftime('%m', timestamp) = ?
-      AND strftime('%Y', timestamp) = ?
-    ORDER BY timestamp;
+      AND strftime('%d', time) = ?
+      AND strftime('%m', time) = ?
+      AND strftime('%Y', time) = ?
+    ORDER BY time;
     """
     for hid in house_ids:
         print(f"Fetching PV data for house {hid} and {house_ids}...")
