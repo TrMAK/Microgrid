@@ -129,8 +129,8 @@ if __name__ == "__main__":
     ]
 
     device_data = {}
-    device_state = {}
-    device_counter = {}
+    device_state = defaultdict(bool)
+    device_counter = defaultdict(int)
     device_priority = {}
     device_time_windows = {}
 
@@ -178,31 +178,35 @@ if __name__ == "__main__":
 
         # enforce windows
         for dev in device_state:
-            if dev in device_time_windows and not is_within_time_window(t, device_time_windows[dev]):
+            device_name = dev[0]
+            if device_name in device_time_windows and not is_within_time_window(t, device_time_windows[dev]):
                 device_state[dev] = False
 
         # load limiting
         if LOADLIMIT:
-            for dev, _ in devices_sorted:
-                if device_state[dev]:
-                    device_state[dev] = False
+            for dev in devices_sorted:
+                device_name = dev[0]
+                if device_state[device_name]:
+                    device_state[device_name] = False
                     break
         else:
-            for dev, _ in devices_sorted:
-                if not device_state[dev]:
+            for dev in devices_sorted:
+                device_name = dev[0]
+                if not device_state[device_name]:
                     if dev in device_time_windows:
                         if is_within_time_window(t, device_time_windows[dev]):
-                            device_state[dev] = True
+                            device_state[device_name] = True
                             break
                     else:
-                        device_state[dev] = True
+                        device_state[device_name] = True
                         break
 
         # accumulate
         for dev, *_ in devices:
-            idx = device_counter[dev]
-            if device_state[dev] and idx < len(device_data[dev]):
-                LOAD += device_data[dev][idx]
+            device_name = dev[0]
+            idx = device_counter[device_name]
+            if device_state[device_name] and idx < len(device_data[device_name]):
+                LOAD += device_data[device_name][idx]
                 device_counter[dev] += 1
 
         # subtract PV
